@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat Room</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        #chat-log {
+            width: 100%;
+            max-width: 600px;
+            height: 400px;
+            background-color: #e5ddd5;
+            border-radius: 10px;
+            padding: 20px;
+            overflow-y: scroll;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .message {
+            padding: 10px;
+            border-radius: 20px;
+            margin-bottom: 10px;
+            max-width: 60%;
+            word-wrap: break-word;
+        }
+
+        .message.sender {
+            background-color: #dcf8c6;
+            align-self: flex-end;
+            text-align: right;
+        }
+
+        .message.receiver {
+            background-color: #ffffff;
+            align-self: flex-start;
+            text-align: left;
+        }
+
+        #chat-message-input {
+            width: 100%;
+            max-width: 540px;
+            padding: 10px;
+            border: 1px solid #dbdbdb;
+            border-radius: 22px;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        #chat-message-submit {
+            width: 100%;
+            max-width: 100px;
+            padding: 10px;
+            background-color: #25d366;
+            color: white;
+            border: none;
+            border-radius: 22px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        #chat-message-submit:hover {
+            background-color: #20c257;
+        }
+
+        /* Scroll bar styling */
+        #chat-log {
+            scrollbar-width: thin;
+            scrollbar-color: #cccccc #e5ddd5;
+        }
+
+        #chat-log::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #chat-log::-webkit-scrollbar-track {
+            background-color: #e5ddd5;
+        }
+
+        #chat-log::-webkit-scrollbar-thumb {
+            background-color: #cccccc;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Room: {{ room_name }}</h2>
+    <div id="chat-log"></div>
+    <input id="chat-message-input" type="text" placeholder="Type a message...">
+    <button id="chat-message-submit">Send</button>
+
+    <script>
+        const roomName = "{{ room_name }}";
+        const chatSocket = new WebSocket(
+            'ws://' + window.location.host + '/ws/chat/' + roomName + '/'
+        );
+
+        let isSender = true;  // Simulate whether the message is from the sender or receiver
+
+        chatSocket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            const chatLog = document.querySelector('#chat-log');
+            const newMessageDiv = document.createElement('div');
+            newMessageDiv.textContent = data.message;
+
+            // Alternate messages between sender and receiver (this is just for demonstration)
+            if (isSender) {
+                newMessageDiv.classList.add('message', 'sender');
+            } else {
+                newMessageDiv.classList.add('message', 'receiver');
+            }
+
+            chatLog.appendChild(newMessageDiv);
+            chatLog.scrollTop = chatLog.scrollHeight;  // Auto-scroll to the bottom
+            isSender = !isSender;  // Toggle sender/receiver for demo purposes
+        };
+
+        document.querySelector('#chat-message-submit').onclick = function() {
+            const messageInputDom = document.querySelector('#chat-message-input');
+            const message = messageInputDom.value;
+            chatSocket.send(JSON.stringify({
+                'message': message
+            }));
+            messageInputDom.value = '';
+        };
+    </script>
+</body>
+</html>

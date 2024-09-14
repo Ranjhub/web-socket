@@ -1,0 +1,95 @@
+<!-- room_list.html -->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat Rooms</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #fafafa;
+            color: #262626;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        form {
+            margin-bottom: 20px;
+        }
+
+        input, button {
+            padding: 10px;
+            margin: 5px;
+            font-size: 16px;
+        }
+
+        input {
+            border: 1px solid #dbdbdb;
+            border-radius: 5px;
+            width: 200px;
+        }
+
+        button {
+            background-color: #3897f0;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #357ae8;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        a {
+            text-decoration: none;
+            color: #3897f0;
+            font-size: 18px;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <h2>Available Chat Rooms</h2>
+
+    <!-- Form to create or join a room with a username -->
+    <form id="room-form" method="POST" action="">
+        {% csrf_token %}
+        <input type="text" id="username" name="username" placeholder="Enter your username" required>
+        <input type="text" id="room-name" name="room_name" placeholder="Enter room name" required>
+        <button type="submit">Join/Create Room</button>
+    </form>
+
+
+
+    <script>
+        document.querySelector('#room-form').onsubmit = function(event) {
+            event.preventDefault();
+            const username = document.querySelector('#username').value;
+            const roomName = document.querySelector('#room-name').value;
+            window.location.href = '/chat/' + roomName + '?username=' + encodeURIComponent(username);
+        };
+    </script>
+</body>
+</html>
